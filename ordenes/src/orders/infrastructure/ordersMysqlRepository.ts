@@ -65,6 +65,10 @@ async listAllOrders(): Promise<Orders[] | null> {
     const keys = Object.keys(updates);
     if (keys.length === 0) return null;
 
+    if (status === "pagado") {
+      return let = ""
+    }
+
     const sqlParts = keys.map(key => `${key} = ?`);
     const sql = `UPDATE orders SET ${sqlParts.join(', ')} WHERE id = ?`;
 
@@ -90,4 +94,6 @@ async listAllOrders(): Promise<Orders[] | null> {
       throw error;
     }
   }
+
+  
 }
