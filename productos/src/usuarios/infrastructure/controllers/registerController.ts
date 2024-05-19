@@ -10,7 +10,6 @@ export class RegisterController {
         name,
         price,
         stock
-     
       } = req.body;
 
 

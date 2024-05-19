@@ -5,7 +5,7 @@ import { RegisterController } from "./registerController";
 import { ListAllOrderController } from "./listAllOrdersController";
 import { ListAllOrdersUseCase } from "../../application/listAllOrdersUseCase";
 
-import { UpdateUserController } from "./updateUserController";
+import { UpdateUserController } from "./updateOrdersController";
 import { UpdateProductUseCase } from "../../application/updateOrdersUseCase";
 
 export const productMysqlRepository = new ProductMysqlRepository();

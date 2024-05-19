@@ -12,4 +12,4 @@ orderRouter.post("/", registerController.run.bind(registerController));
 orderRouter.get("/", (req, res) => listAllProductController.run(req, res));
 
 // Ruta para actualizar un usuario por su ID
-orderRouter.put("/buy", updateProductController.run.bind(updateProductController));
+orderRouter.put("/", updateProductController.run.bind(updateProductController));

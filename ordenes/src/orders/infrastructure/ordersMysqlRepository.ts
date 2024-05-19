@@ -3,47 +3,63 @@ import { Orders } from "../domain/orders";
 import { IOrdersRepository } from "../domain/ordersRepository";
 
 export class ProductMysqlRepository implements IOrdersRepository {
-  
-  async createOrder(total: number, date: Date, status: string): Promise<Orders | null> {
+
+  async createOrder(total: number, status: string): Promise<Orders | null> {
     try {
-      const sql = "INSERT INTO orders (total, date, status) VALUES (?, ?, ?)";
-      const params: any[] = [total, date.toISOString().slice(0, 19).replace('T', ' '), status];
-      const [result]: any = await query(sql, params, poolOrdersDb);
-      if (result.insertId) {
-        const order = new Orders(result.insertId, total, date, status);
-        return order;
-      } else {
-        console.error("No se pudo insertar la orden en la base de datos.");
+        const sql = "INSERT INTO orders (total, status) VALUES (?, ?)";
+        const params: any[] = [total, status];
+        const result: any = await query(sql, params);
+
+        if (result && result[1] && result[1].insertId) {
+            const insertedId = result[1].insertId;
+
+            const [rows]: any = await query("SELECT * FROM orders WHERE id = ?", [insertedId]);
+            if (rows && rows[0]) {
+                const { id, total, status } = rows[0];
+                return new Orders(id, total, status);
+            } else {
+                console.error("No se pudo recuperar la orden recién creada.");
+                return null;
+            }
+        } else {
+            console.error("No se pudo insertar la orden en la base de datos.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error al registrar la orden:", error);
         return null;
-      }
-    } catch (error) {
-      console.error("Error al registrar la orden:", error);
-      return null;
     }
-  }
+}
 
-  async listAllOrders(): Promise<Orders[] | null> {
-    try {
-      const sql = "SELECT * FROM orders";
-      const [rows]: any = await query(sql, [], poolOrdersDb);
-      if (!Array.isArray(rows)) {
-        throw new Error('Rows is not an array');
-      }
-      const orders: Orders[] = rows.map((row: any) => {
-        return new Orders(row.id, row.total, new Date(row.date), row.status);
-      });
-      return orders;
-    } catch (error) {
-      console.error("Error al listar órdenes:", error);
-      return null;
+
+async listAllOrders(): Promise<Orders[] | null> {
+  try {
+    const sql = "SELECT * FROM orders";
+    const [rows]: any = await query(sql);
+
+    if (!Array.isArray(rows)) {
+      throw new Error('Rows is not an array');
     }
-  }
-  
 
-  async updateOrders(id: number, total?: number, date?: Date, status?: string): Promise<Orders | null> {
+    const orders: Orders[] = rows.map((row: any) => {
+      return new Orders(
+        row.id,
+        row.total,
+        row.status
+      );
+    });
+
+    return orders;
+  } catch (error) {
+    console.error("Error al listar órdenes:", error);
+    return null;
+  }
+}
+
+
+
+  async updateOrders(id: number, status?: string): Promise<Orders | null> {
     const updates: { [key: string]: any } = {};
-    if (total !== undefined) updates.total = total;
-    if (date !== undefined) updates.date = date.toISOString().slice(0, 19).replace('T', ' ');
     if (status !== undefined) updates.status = status;
 
     const keys = Object.keys(updates);
@@ -55,8 +71,9 @@ export class ProductMysqlRepository implements IOrdersRepository {
     try {
       const values = keys.map(key => updates[key]);
       values.push(id);
-      await query(sql, values, poolOrdersDb);
-      const [updatedRows]: any = await query('SELECT * FROM orders WHERE id = ?', [id], poolOrdersDb);
+      await query(sql, values);
+      const result: any = await query('SELECT * FROM orders WHERE id = ?', [id]);
+      const updatedRows = result[0];
       if (!updatedRows || updatedRows.length === 0) {
         throw new Error('No hay órdenes con esa ID.');
       }
@@ -64,8 +81,7 @@ export class ProductMysqlRepository implements IOrdersRepository {
       const updatedOrder = new Orders(
         updatedRows[0].id,
         updatedRows[0].total,
-        new Date(updatedRows[0].date),
-        updatedRows[0].status,
+        updatedRows[0].status
       );
 
       return updatedOrder;

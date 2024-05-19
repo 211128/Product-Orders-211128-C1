@@ -7,13 +7,11 @@ export class UpdateProductUseCase {
     
     async run(
         id: number,
-        total?: number,
-        date?: Date,
-        status?: string
+        status: string
         ): Promise<Orders | null> {
         console.log("updated")
         try {
-            const updateUserById = await this.userRepository.updateOrders(id,total,date, status);
+            const updateUserById = await this.userRepository.updateOrders(id, status);
             return updateUserById;
         } catch (error) {
             return null;

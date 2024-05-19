@@ -6,14 +6,12 @@ export class RegisterUseCase {
 
   async run(
     total: number,
-    date: Date,
-    status: string,
+    status: string
   ): Promise<Orders | null> {
     try {
       const createNewUser = await this.orderRepository.createOrder(
         total,
-        date,
-        status,
+        status
 
       );
 

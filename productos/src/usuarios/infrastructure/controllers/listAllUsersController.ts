@@ -8,15 +8,15 @@ export class ListAllUserController {
 
     async run(req: express.Request, res: express.Response) {
         try {
-            const listAllUser = await this.listAllUserUseCase.run();
+            const listAllProduct = await this.listAllUserUseCase.run();
 
-            if (listAllUser) {
+            if (listAllProduct) {
                 console.log("Respuesta exitosa:", ); // Imprimir respuesta exitosa en la consola
 
                 return res.status(200).send({
                     status: "success",
                     data: {
-                        listAllUser: listAllUser,
+                        listAllProducts: listAllProduct,
                     },
                 });
             } else {

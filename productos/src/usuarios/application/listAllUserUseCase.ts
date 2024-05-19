@@ -1,5 +1,5 @@
 import { Product } from "../domain/product";
-import { IProductRepository as IProductRepository } from "../domain/userRepository";
+import { IProductRepository as IProductRepository } from "../domain/productRepository";
 
 export class ListAllProductUseCase {
   constructor(private readonly productRepository: IProductRepository) {}
@@ -12,11 +12,11 @@ export class ListAllProductUseCase {
       if (listAllActiveUser) {
         return listAllActiveUser;
       } else {
-        throw new Error("No se encontraron usuarios activos.");
+        throw new Error("No se encontraron productos.");
       }
     } catch (err: any) {
       // Lanza una excepción con un mensaje de error específico.
-      throw new Error("Error al obtener la lista de usuarios: " + err.message);
+      throw new Error("Error al obtener la lista de productos: " + err.message);
     }
   }
 }

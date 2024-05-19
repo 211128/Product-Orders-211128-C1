@@ -1,6 +1,6 @@
 import { query } from "../../database/conecction";
 import { Product } from "../domain/product";
-import { IProductRepository } from "../domain/userRepository";
+import { IProductRepository } from "../domain/productRepository";
 
 export class ProductMysqlRepository implements IProductRepository {
   async createProduct(name: string, price: number, stock: number): Promise<Product | null> {

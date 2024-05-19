@@ -20,11 +20,11 @@ const configOrdersDb = {
 const poolOrdersDb = mysql.createPool(configOrdersDb);
 
 // Función para ejecutar consultas SQL
-export async function query(sql: string, params: any[], pool: mysql.Pool) {
+export async function query(sql: string, params?: any[]) {
     try {
-        const conn = await pool.getConnection();
+        const conn = await poolOrdersDb.getConnection();
         signale.success("Conexión exitosa a la BD");
-        const [result] = await conn.execute(sql, params);
+        const result = await conn.execute(sql, params);
         conn.release();
         return result;
     } catch (error) {
@@ -71,7 +71,7 @@ async function createTables() {
                 date DATETIME NOT NULL,
                 status ENUM('Pagado', 'Creado', 'Enviado') NOT NULL
             )
-        `, [], poolOrdersDb);
+        `);
 
         // Crear la tabla de asociación en la base de datos de órdenes, con referencias completas a las tablas en sus respectivas bases de datos
         await query(`
@@ -82,7 +82,7 @@ async function createTables() {
                 price DECIMAL(10, 2) NOT NULL,
                 quantity INT NOT NULL
             )
-        `, [], poolOrdersDb);
+        `);
 
         signale.success("Tablas creadas o verificadas exitosamente");
     } catch (error) {

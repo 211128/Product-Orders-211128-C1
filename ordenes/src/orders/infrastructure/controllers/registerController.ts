@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 import { RegisterUseCase } from "../../application/registerUseCase";
 
 export class RegisterController {
@@ -6,19 +6,21 @@ export class RegisterController {
 
   async run(req: Request, res: Response) {
     try {
-      const {
-        total,
-        date,
-        status
-     
-      } = req.body;
+      const { total, status } = req.body;
+
+      const statusLower = status.toLowerCase();
 
 
-  
+      // Validar que el estado sea uno de los valores permitidos
+      if (!['creado', 'pagado', 'enviado'].includes(statusLower)) {
+        return res.status(400).json({
+          status: "error",
+          message: 'El estado debe ser "creado", "pagado" o "enviado"',
+        });
+      }
 
       const registerProduct = await this.registerUseCase.run(
         total,
-        date,
         status
       );
 
@@ -26,15 +28,15 @@ export class RegisterController {
         return res.status(201).json({
           status: "success",
           data: {
-            name: registerProduct.total,
-            price: registerProduct.date,
+            total: registerProduct.total,
+            status: registerProduct.status,
           },
         });
       } else {
-        // Manejar el caso donde el registro no fue exitoso
-        return res.status(400).json({
-          status: "error",
-          message: "El registro de usuario no fue exitoso.",
+        
+        return res.status(200).json({
+          status: "success",
+          message: "El registro de la orden fue exitosa.",
         });
       }
     } catch (err) {
